@@ -49,25 +49,32 @@ Clipnt()
 
 selection := Clipnt()
 
-selectionList := StrSplit(selection, A_Space)
-
-baseURL := "https://www.amazon.com/s?k="
-
-fullUrl := baseURL
-
-for index, element in selectionList
+if (selection == "")
 {
-    fullURL .= element
-    fullURL .= "+"
+    return
 }
+Else
+{
+    selectionList := StrSplit(selection, A_Space)
 
-; above concatened selection into amazon URL
+    baseURL := "https://www.amazon.com/s?k="
 
-Run, %fullUrl% ; opens amazon url in new chrome tab
+    fullUrl := baseURL
 
-; https://www.amazon.com/s?k=search+bar
+    for index, element in selectionList
+    {
+        fullURL .= element
+        fullURL .= "+"
+    }
 
-return
+    ; above concatened selection into amazon URL
+
+    Run, %fullUrl% ; opens amazon url in new chrome tab
+
+    ; https://www.amazon.com/s?k=search+bar
+
+    return
+}
 
 +Esc:: ; escape code: shift+esc otherwise just end script as usual
 ExitApp, 1
