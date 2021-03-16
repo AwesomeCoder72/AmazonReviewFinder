@@ -2,12 +2,12 @@
 SendMode Input
 SetWorkingDir, %A_ScriptDir%
 
-/*
-    The following has been stolen from https://github.com/berban/Clip/blob/master/Clip.ahk
-*/
 
 Clip(Text="", Reselect="")
 {
+    /*
+        The following has been stolen from https://github.com/berban/Clip/blob/master/Clip.ahk
+    */
 	Static BackUpClip, Stored, LastClip
 	If (A_ThisLabel = A_ThisFunc) {
 		If (Clipboard == LastClip)
@@ -40,10 +40,45 @@ Clip(Text="", Reselect="")
 	Return Clip()
 }
 
+Clipnt()
+{
+    /*
+        1. Takes previous clipboard copy and stores it
+        2. Uses current selection (storing in clipboard in the process)
+        3. returning clipboard to original data
+    */
+    static previousClip, postClip
+    
+    previousClip := clipboard
+    clipboard := ""
+
+    LongCopy := A_TickCount, Clipboard := "", LongCopy -= A_TickCount ; stolen from clip()
+
+    SendInput, ^c
+    ClipWait, LongCopy ? 0.6 : 0.2, True ; stolen from Clip()
+    if ErrorLevel {
+        MsgBox, The attempt to copy text onto the clipboard failed.
+        return 
+    }
+
+    postClip := clipboard
+    clipboard := ""
+    clipboard := previousClip
+
+    Return postClip
+
+
+}
 +.::
-Send, ^C
-clipInfo := ClipBoard
-msgbox, Format("ClipInfo: {}", clipInfo)
+
+MsgBox, % "Clipnt: " Clipnt()
+
+; selected := Clip()
+; board := Clipboard
+; msgbox, % "Selected Text:\n" selected "\nboard:\n" board
 ; Run, https://www.autohotkey.com/
 
 return
+
++Esc::
+ExitApp, 21
