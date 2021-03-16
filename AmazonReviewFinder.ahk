@@ -37,7 +37,7 @@ Clipnt()
 
 
 }
-+.::
+^.::
 
 selection := Clipnt()
 
