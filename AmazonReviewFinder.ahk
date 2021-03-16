@@ -15,8 +15,10 @@ Clipnt()
         2. Uses current selection (storing in clipboard in the process)
         3. returning clipboard to original data
     */
-    static previousClip, postClip
+    static previousClip, postClip, errorCaught
     
+    errorCaught := False
+
     previousClip := clipboard
     clipboard := ""
 
@@ -25,7 +27,7 @@ Clipnt()
     SendInput, ^c
     ClipWait, LongCopy ? 0.6 : 0.2, True ; stolen from Clip()
     if ErrorLevel {
-        MsgBox, The attempt to copy text onto the clipboard failed.
+        errorCaught = True
         return 
     }
 
@@ -33,8 +35,14 @@ Clipnt()
     clipboard := ""
     clipboard := previousClip
 
-    Return postClip
-
+    if (errorCaught)
+    {
+        return ""
+    } 
+    else 
+    {
+        Return postClip
+    }
 
 }
 ^.::
