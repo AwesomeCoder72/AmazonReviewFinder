@@ -2,43 +2,11 @@
 SendMode Input
 SetWorkingDir, %A_ScriptDir%
 
+/*
+    https://github.com/berban/Clip/blob/master/Clip.ahk
 
-Clip(Text="", Reselect="")
-{
-    /*
-        The following has been stolen from https://github.com/berban/Clip/blob/master/Clip.ahk
-    */
-	Static BackUpClip, Stored, LastClip
-	If (A_ThisLabel = A_ThisFunc) {
-		If (Clipboard == LastClip)
-			Clipboard := BackUpClip
-		BackUpClip := LastClip := Stored := ""
-	} Else {
-		If !Stored {
-			Stored := True
-			BackUpClip := ClipboardAll ; ClipboardAll must be on its own line
-		} Else
-			SetTimer, %A_ThisFunc%, Off
-		LongCopy := A_TickCount, Clipboard := "", LongCopy -= A_TickCount ; LongCopy gauges the amount of time it takes to empty the clipboard which can predict how long the subsequent clipwait will need
-		If (Text = "") {
-			SendInput, ^c
-			ClipWait, LongCopy ? 0.6 : 0.2, True
-		} Else {
-			Clipboard := LastClip := Text
-			ClipWait, 10
-			SendInput, ^v
-		}
-		SetTimer, %A_ThisFunc%, -700
-		Sleep 20 ; Short sleep in case Clip() is followed by more keystrokes such as {Enter}
-		If (Text = "")
-			Return LastClip := Clipboard
-		Else If ReSelect and ((ReSelect = True) or (StrLen(Text) < 3000))
-			SendInput, % "{Shift Down}{Left " StrLen(StrReplace(Text, "`r")) "}{Shift Up}"
-	}
-	Return
-	Clip:
-	Return Clip()
-}
+    Clip() Source
+*/
 
 Clipnt()
 {
@@ -52,7 +20,7 @@ Clipnt()
     previousClip := clipboard
     clipboard := ""
 
-    LongCopy := A_TickCount, Clipboard := "", LongCopy -= A_TickCount ; stolen from clip()
+    LongCopy := A_TickCount, Clipboard := "", LongCopy -= A_TickCount ; stolen from Clip()
 
     SendInput, ^c
     ClipWait, LongCopy ? 0.6 : 0.2, True ; stolen from Clip()
@@ -71,14 +39,27 @@ Clipnt()
 }
 +.::
 
-MsgBox, % "Clipnt: " Clipnt()
+selection := Clipnt()
 
-; selected := Clip()
-; board := Clipboard
-; msgbox, % "Selected Text:\n" selected "\nboard:\n" board
-; Run, https://www.autohotkey.com/
+selectionList := StrSplit(selection, A_Space)
+
+baseURL := "https://www.amazon.com/s?k="
+
+fullUrl := baseURL
+
+for index, element in selectionList
+{
+    fullURL .= element
+    fullURL .= "+"
+}
+
+; above concatened selection into amazon URL
+
+Run, %fullUrl% ; opens amazon url in new chrome tab
+
+; https://www.amazon.com/s?k=search+bar
 
 return
 
-+Esc::
-ExitApp, 21
++Esc:: ; escape code: shift+esc otherwise just end script as usual
+ExitApp, 1
